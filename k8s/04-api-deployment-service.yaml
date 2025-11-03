@@ -12,15 +12,23 @@ spec:
     metadata:
       labels:
         app: fiapbank-api
-    spec:
+    spec: # <-- Este é o spec do POD
+      
+      # ------------------- VAI EXATAMENTE AQUI ------------------- #
+      # (Alinhado com 'containers:' abaixo)
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000 # O ID 1000 que definimos no Dockerfile (appuser)
+      # ------------------------------------------------------------- #
+
       containers:
       - name: api
-        image: robelio/fiapbank-api:v1 # <-- Sua imagem do Docker Hub
+        image: robelio/fiapbank-api:v1 
         ports:
         - containerPort: 3000
         env:
         - name: DB_HOST
-          value: "db-service" # O nome do Service do DB
+          value: "db-service"
         - name: DB_USER
           value: "fiap"
         - name: DB_PASSWORD
@@ -28,17 +36,13 @@ spec:
             secretKeyRef:
               name: db-secret
               key: DB_PASSWORD
-        
-        # ------------------- VAI EXATAMENTE AQUI ------------------- #
-        # (Alinhado com 'name', 'image', 'ports', e 'env' acima)
-        resources:
+        resources: # <-- Este fica DENTRO de 'containers:'
           limits:
             memory: "128Mi"
-            cpu: "500m" # Meio core
+            cpu: "500m"
           requests:
             memory: "64Mi"
-            cpu: "250m" # 1/4 de core
-        # ------------------------------------------------------------- #
+            cpu: "250m"
 
 ---
 apiVersion: v1
@@ -47,11 +51,11 @@ metadata:
   name: api-service
   namespace: unifiappay
 spec:
-  type: NodePort # Para acessar facilmente no Kind
+  type: NodePort
   selector:
     app: fiapbank-api
   ports:
   - protocol: TCP
     port: 80
     targetPort: 3000
-    nodePort: 30080 # Acessível em http://localhost:30080
+    nodePort: 30080
