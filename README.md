@@ -12,11 +12,17 @@ WSL2 (Ubuntu): Ambiente de desenvolvimento e execução.
 
 # 📂 Estrutura do Repositório
 /fiapbank-k8s
+
 ├── /src            # Código-fonte da API de exemplo (Node.js)
+
 ├── /docker         # Dockerfile (multi-stage) e docker-compose.yml (para testes locais)
+
 ├── /images         # Imagens com as evidências
+
 ├── /k8s            # Manifestos YAML do Kubernetes (Deployments, Services, Secrets, etc.)
+
 └── README.md       # Esta documentação
+
 
 # 🛠️ Como Executar o Projeto
 Siga os passos abaixo para construir e implantar a aplicação no cluster Kind.
