@@ -1,0 +1,43 @@
+version: '3.8'
+
+# 1. Definição dos Serviços (Containers)
+services:
+
+  # 2. Serviço da API (baseado na imagem que você publicou)
+  api:
+    image: robelio/fiapbank-api:v1
+    container_name: fiapbank-api
+    ports:
+      - "3000:3000"  # Expõe a porta 3000 do container para a porta 3000 da sua máquina
+    environment:
+      # 3. Variáveis de ambiente seguras para a API
+      - DB_HOST=pix-db     # A MÁGICA: O Docker vai resolver 'pix-db' para o IP do container do banco
+      - DB_USER=fiap
+      - DB_PASSWORD=fiap2025
+    networks:
+      - fiapbank-net # Conecta esta API na nossa rede customizada
+    depends_on:
+      - db           # Diz ao Docker para só iniciar a API DEPOIS que o banco 'db' estiver pronto
+
+  # 4. Serviço do Banco de Dados PIX
+  db:
+    image: postgres:14-alpine
+    container_name: pix-db
+    environment:
+      # 5. Variáveis de ambiente seguras para o Banco
+      - POSTGRES_USER=fiap
+      - POSTGRES_DB=pix
+      - POSTGRES_PASSWORD=fiap2025
+    volumes:
+      - db_data:/var/lib/postgresql/data # Cria um volume para persistir os dados
+    networks:
+      - fiapbank-net # Conecta o banco na mesma rede
+
+# 6. Definição da Rede Customizada
+networks:
+  fiapbank-net:
+    driver: bridge # O driver padrão para redes locais
+
+# 7. Definição do Volume de Persistência
+volumes:
+  db_data:

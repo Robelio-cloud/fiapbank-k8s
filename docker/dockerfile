@@ -1,0 +1,36 @@
+# ----- Estágio 1: Build -----
+# Use uma imagem completa com as ferramentas de build
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copia os arquivos de dependência e instala
+COPY src/package.json src/package-lock.json ./
+RUN npm install --only=production
+
+# Copia o resto do código-fonte
+COPY src/ ./
+
+# (Se sua API precisar de um passo de "build", ex: TypeScript, adicione aqui)
+# RUN npm run build
+
+# ----- Estágio 2: Final -----
+# Use uma imagem mínima e segura
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Crie um usuário não-root para segurança
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+# Copie as dependências instaladas do estágio 'builder'
+COPY --from=builder /app/node_modules ./node_modules
+# Copie o código da aplicação do estágio 'builder'
+COPY --from=builder /app/ ./
+
+# Expõe a porta que sua API usa
+EXPOSE 3000
+
+# Comando para iniciar a API
+CMD [ "node", "index.js" ]

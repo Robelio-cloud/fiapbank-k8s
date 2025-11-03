@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-job
+  namespace: unifiappay
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: auditor
+            image: busybox
+            command:
+            - /bin/sh
+            - -c
+            - "wget -O- http://api-service/health; echo 'Auditoria concluída'" # Assume que sua API tem um endpoint /health
+          restartPolicy: OnFailure
