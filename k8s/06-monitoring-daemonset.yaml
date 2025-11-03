@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: monitoring-agent
+  namespace: unifiappay
+spec:
+  selector:
+    matchLabels:
+      app: monitor-agent
+  template:
+    metadata:
+      labels:
+        app: monitor-agent
+    spec:
+      containers:
+      - name: agent
+        image: busybox
+        command: ["sleep", "3600"]
+        # Um agente real faria coleta de logs ou métricas
